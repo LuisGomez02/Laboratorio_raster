@@ -17,9 +17,7 @@ cr_pharo_mocinno <-
   st_read(
     "https://raw.githubusercontent.com/geoprocesamiento-2020i/datos/master/biodiversidad/registros-presencia/cr/cr_pharomachrus_mocinno.geojson"
   )
-```
 
-```{r}
 altitude <- getData("worldclim", var="alt", res=.5, lon=-84, lat=10)
 cr_altitude <- crop(altitude, extent(-86, -82.3, 8, 11.3))  
 
@@ -27,9 +25,7 @@ precipitation <- getData("worldclim", var="bio", res=.5, lon=-84, lat=10)
 precipitation <- precipitation[[c(12)]]
 names(precipitation) <- c("Prec")
 cr_precipitation <- crop(precipitation, extent(-86, -82.3, 8, 11.3))
-```
 
-```{r}
 pal <- colorNumeric(
   c("#0C2C84", "#41B6C4", "#FFFFCC"), 
   values(cr_altitude), 
@@ -81,5 +77,8 @@ m <- leaflet() %>%
     tiles = providers$Stamen.TonerLite
   )
 
+```
+
+```{r}
 m
 ```
