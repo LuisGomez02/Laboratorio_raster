@@ -17,22 +17,69 @@ cr_pharo_mocinno <-
   st_read(
     "https://raw.githubusercontent.com/geoprocesamiento-2020i/datos/master/biodiversidad/registros-presencia/cr/cr_pharomachrus_mocinno.geojson"
   )
+```
 
-setwd("c:/users/Documents/Clase_raster")
-
+```{r}
 altitude <- getData("worldclim", var="alt", res=.5, lon=-84, lat=10)
-
-# Datos de altitud recortados para los lÃ�mites aproximados de Costa Rica
 cr_altitude <- crop(altitude, extent(-86, -82.3, 8, 11.3))  
+
+precipitation <- getData("worldclim", var="bio", res=.5, lon=-84, lat=10)
+precipitation <- precipitation[[c(12)]]
+names(precipitation) <- c("Prec")
+cr_precipitation <- crop(precipitation, extent(-86, -82.3, 8, 11.3))
 ```
 
-## R Markdown
+```{r}
+pal <- colorNumeric(
+  c("#0C2C84", "#41B6C4", "#FFFFCC"), 
+  values(cr_altitude), 
+  na.color = "transparent"
+)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+m <- leaflet() %>% 
+  addProviderTiles(providers$Esri.WorldImagery, group = "ImÃ¡genes de ESRI") %>% 
+  addProviderTiles(providers$Stamen.TonerLite, group = "Stamen Toner Lite") %>%
+  addProviderTiles(providers$OpenStreetMap.Mapnik, group = "OpenStreetMap") %>%
+  addCircleMarkers(data = cr_ara_ambiguus,
+                   stroke = F,
+                   radius = 4,
+                   fillColor = 'green',
+                   fillOpacity = 1,
+                   group = "Ara ambiguus",
+                   popup = paste(cr_ara_ambiguus$locality, 
+                                 cr_ara_ambiguus$year, 
+                                 sep = '<br/>'
+                   )
+  ) %>%
+   addCircleMarkers(data = cr_pharo_mocinno,
+                   stroke = F,
+                   radius = 4,
+                   fillColor = 'red',
+                   fillOpacity = 1,
+                   group = "Pharomachrus mocinno",
+                   popup = paste(cr_pharo_mocinno$locality, 
+                                 cr_pharo_mocinno$year, 
+                                 sep = '<br/>'
+                   )
+  ) %>%addRasterImage(cr_altitude, 
+                 colors = pal, 
+                 opacity = 0.8, 
+                 group = "Altitud"
+  ) %>%
+  addLayersControl(
+    baseGroups = c("OpenStreetMap", "Stamen Toner Lite", "ImÃ¡genes de ESRI"),
+    overlayGroups = c("Altitud", "Ara ambiguus", "Pharomachrus mocinno"),
+    options = layersControlOptions(collapsed = FALSE)    
+  ) %>%
+  addLegend(pal = pal, 
+            values = values(cr_altitude), 
+            title = "Altitud"
+  ) %>%
+  addMiniMap(
+    toggleDisplay = TRUE,
+    position = "bottomleft",
+    tiles = providers$Stamen.TonerLite
+  )
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+m
 ```
-
