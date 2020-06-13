@@ -1,0 +1,38 @@
+---
+title: "Laboratorio #4"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(leaflet)
+library(raster)
+library(rgdal)
+library(sf)
+
+cr_ara_ambiguus <-
+  st_read(
+    "https://raw.githubusercontent.com/geoprocesamiento-2020i/datos/master/biodiversidad/registros-presencia/cr/cr-ara-ambiguus.geojson"
+  )
+cr_pharo_mocinno <-
+  st_read(
+    "https://raw.githubusercontent.com/geoprocesamiento-2020i/datos/master/biodiversidad/registros-presencia/cr/cr_pharomachrus_mocinno.geojson"
+  )
+
+setwd("c:/users/Documents/Clase_raster")
+
+altitude <- getData("worldclim", var="alt", res=.5, lon=-84, lat=10)
+
+# Datos de altitud recortados para los lÃƒ­mites aproximados de Costa Rica
+cr_altitude <- crop(altitude, extent(-86, -82.3, 8, 11.3))  
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
