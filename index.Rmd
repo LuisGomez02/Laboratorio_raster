@@ -1,5 +1,5 @@
 ---
-title: "Laboratorio #4"
+title: "Laboratorio 04 Ráster"
 output: html_document
 ---
 
@@ -23,12 +23,17 @@ cr_altitude <- crop(altitude, extent(-86, -82.3, 8, 11.3))
 
 precipitation <- getData("worldclim", var="bio", res=.5, lon=-84, lat=10)
 precipitation <- precipitation[[c(12)]]
-names(precipitation) <- c("Prec")
 cr_precipitation <- crop(precipitation, extent(-86, -82.3, 8, 11.3))
 
 pal <- colorNumeric(
   c("#0C2C84", "#41B6C4", "#FFFFCC"), 
   values(cr_altitude), 
+  na.color = "transparent"
+)
+
+pal_1 <- colorNumeric(
+  c("#FF9900", "#FFFF00", "#FFFFCC"), 
+  values(cr_precipitation), 
   na.color = "transparent"
 )
 
@@ -61,19 +66,27 @@ m <- leaflet() %>%
                  colors = pal, 
                  opacity = 0.8, 
                  group = "Altitud"
+  ) %>%addRasterImage(cr_precipitation, 
+                 colors = pal_1, 
+                 opacity = 0.8, 
+                 group = "Precipitación"
   ) %>%
   addLayersControl(
     baseGroups = c("OpenStreetMap", "Stamen Toner Lite", "ImÃ¡genes de ESRI"),
-    overlayGroups = c("Altitud", "Ara ambiguus", "Pharomachrus mocinno"),
+    overlayGroups = c("Altitud", "Precipitación", "Ara ambiguus", "Pharomachrus mocinno"),
     options = layersControlOptions(collapsed = FALSE)    
   ) %>%
-  addLegend(pal = pal, 
+  addLegend("bottomleft", pal = pal, 
             values = values(cr_altitude), 
             title = "Altitud"
   ) %>%
+  addLegend("bottomleft", pal = pal_1, 
+            values = values(cr_precipitation), 
+            title = "Precipitación"
+  ) %>%
   addMiniMap(
     toggleDisplay = TRUE,
-    position = "bottomleft",
+    position = "bottomright",
     tiles = providers$Stamen.TonerLite
   )
 
